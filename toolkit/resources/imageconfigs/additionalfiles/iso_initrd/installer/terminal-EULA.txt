@@ -1,0 +1,2 @@
+This CBL-Mariner is builded use project: Build-CBL-Mariner.
+Source: https://github.com/rdp-studio/Build-CBL-Mariner
