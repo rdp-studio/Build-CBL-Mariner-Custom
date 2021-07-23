@@ -1,0 +1,94 @@
+name: CBL-Mariner Builder
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+    TZ: Asia/Shanghai
+
+jobs:
+  runer:
+    runs-on: ubuntu-18.04
+
+    steps: 
+      - uses: actions/checkout@v2
+        with:
+          repository: microsoft/CBL-Mariner
+          path: .
+     
+      - uses: actions/checkout@v2
+        with:
+          path: custom
+      
+      - name: Modify
+        run: |
+          cp -R -u ./custom/* ./
+          rm -rf ./custom
+        
+      - name: Set up Go 1.15
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+        id: go
+      
+      - name: Install Remaining Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz parted
+      
+      - name: Build
+        id: builder
+        run: |
+          cd toolkit
+          sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
+          echo "::set-env name=UPLOAD_COWTRANSFER::true"
+          echo "::set-env name=date::$(date "+%Y-%m-%d %H.%M")"
+          echo "::set-env name=date1::$(date +'%Y年%m月%d号-%H点%M分')"
+          echo "::set-env name=date2::$(date +'%Y%m%d-%H%M')"
+      
+      - name: Upload to Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: CBL-Mariner
+          path: |
+            ./out/images/full/*.iso
+      
+      - name: Upload to「奶牛快传」And「wetransfer」
+        if: steps.builder.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer cow --block 2621440 -s -p 64 --no-progress ./out/images/full/*.iso 2>&1 | tee cowtransfer.log
+          echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ./out/images/full/*.iso 2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+    
+      - name: Get「奶牛快传」And「WeTransfer」Link
+        if: steps.builder.outputs.status == 'success' && !cancelled()
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer cow --block 2621440 -s -p 64 --no-progress ./out/images/full/*.iso 2>&1 | tee cowtransfer.log
+          echo "::set-env name=COWTRANSFER_URL::$(cat cowtransfer.log | grep https | cut -f3 -d" ")" 
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ./out/images/full/*.iso 2>&1 | tee wetransfer.log
+          echo "::set-env name=WETRANSFER_URL::$(cat wetransfer.log | grep https | cut -f3 -d" ")"    
+
+      - name: Auto Release
+        uses: softprops/action-gh-release@v1
+        if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        with:
+          name: ${{ env.date1 }} 「 CBL-Mariner-Custom 」系统下载
+          tag_name: ${{ env.date2 }}
+          body: |            
+              🎉 [ CBL-Mariner-Custom ]系统下载 ✨
+              
+              💐 奶牛快传(国内高速🚀下载)： ${{ env.COWTRANSFER_URL }}
+              
+              ⛄ WeTransfer(国外高速🚀下载)： ${{ env.WETRANSFER_URL }}
+              
+              🌴 链接有效期为7天，无需注册直接下载 🐤
+        files: ./out/images/full/*.iso
