@@ -1,7 +1,7 @@
 {
     "SystemConfigs": [
         {
-            "Name": "CBL-Mariner In Dream",
+            "Name": "CBL-Mariner Full",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
@@ -13,7 +13,7 @@
             }
         },
         {
-            "Name": "CBL-Mariner In Real",
+            "Name": "CBL-Mariner Core (Default)",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json"
