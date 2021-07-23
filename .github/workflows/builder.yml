@@ -91,4 +91,4 @@ jobs:
               ⛄ WeTransfer(国外高速🚀下载)： ${{ env.WETRANSFER_URL }}
               
               🌴 链接有效期为7天，无需注册直接下载 🐤
-        files: ./out/images/full/*.iso
+          files: ./out/images/full/*.iso
