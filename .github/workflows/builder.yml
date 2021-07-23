@@ -76,7 +76,7 @@ jobs:
       - name: Auto Release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           name: ${{ env.date1 }} 「 CBL-Mariner-Custom 」系统下载
           tag_name: ${{ env.date2 }}
@@ -87,5 +87,5 @@ jobs:
               
               ⛄ WeTransfer(国外高速🚀下载)： ${{ env.WETRANSFER_URL }}
               
-              🌴 链接有效期为7天，无需注册直接下载 🐤
+              🌴 WeTransfer链接有效期为7天，奶牛快传有效期24小时，无需注册直接下载 🐤
           files: ./out/images/full/*.iso
