@@ -8,8 +8,6 @@ on:
 env:
     TZ: Asia/Shanghai
     ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-    UPLOAD_COWTRANSFER: true
-    UPLOAD_RELEASE: true
 
 jobs:
   runer:
@@ -42,7 +40,6 @@ jobs:
           sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz parted
       
       - name: Build
-        id: builder
         run: |
           cd toolkit
           sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
@@ -59,7 +56,6 @@ jobs:
             ./out/images/full/*.iso
       
       - name: Upload to「奶牛快传」And「wetransfer」
-        if: steps.builder.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
           ./transfer cow --block 2621440 -s -p 64 --no-progress ./out/images/full/*.iso 2>&1 | tee cowtransfer.log
@@ -69,7 +65,6 @@ jobs:
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
     
       - name: Get「奶牛快传」And「WeTransfer」Link
-        if: steps.builder.outputs.status == 'success' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
           ./transfer cow --block 2621440 -s -p 64 --no-progress ./out/images/full/*.iso 2>&1 | tee cowtransfer.log
@@ -80,7 +75,6 @@ jobs:
 
       - name: Auto Release
         uses: softprops/action-gh-release@v1
-        if: steps.builder.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         with:
