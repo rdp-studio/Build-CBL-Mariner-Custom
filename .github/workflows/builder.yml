@@ -8,6 +8,8 @@ on:
 env:
     TZ: Asia/Shanghai
     ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    UPLOAD_COWTRANSFER: true
+    UPLOAD_RELEASE: true
 
 jobs:
   runer:
@@ -78,7 +80,7 @@ jobs:
 
       - name: Auto Release
         uses: softprops/action-gh-release@v1
-        if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
+        if: steps.builder.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         with:
