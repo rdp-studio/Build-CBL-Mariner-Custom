@@ -1,4 +1,4 @@
 # Build-CBL-Mariner-Custom
-Use the GitHub Actions to build the CBL-Mariner that you edit.
+[![CBL-Mariner Builder](https://github.com/rdp-studio/Build-CBL-Mariner-Custom/actions/workflows/builder.yml/badge.svg)](https://github.com/rdp-studio/Build-CBL-Mariner-Custom/actions/workflows/builder.yml)
 
-For just now, everyedit is based on [1.0-stable](https://github.com/microsoft/CBL-Mariner/tree/1.0-stable).
+Use the GitHub Actions to build the CBL-Mariner that is customsized and stored on GitHub.
